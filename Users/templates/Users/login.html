@@ -1,0 +1,21 @@
+{% extends "HealthyLiving/base.html" %}
+{% load crispy_forms_tags %}
+
+  {% block content%}
+  <div class="content-section">
+    <form method="POST">
+      {% csrf_token %}
+      <h3>Login!</h3>
+      <fieldset class="form-group">
+        {{ form |crispy}}
+      </fieldset>
+      <div class="form-group">
+        <button class="btn btn-primary" name="button" type="submit">Login!</button>
+      </div>
+    </form>
+    <div class="border-top pt-3">
+      <small class="text-muted">Need an account? <a class="ml-2" href="{% url 'register' %}">Sign Up!</a></small>
+      <small class="text-muted">Forgot Password? <a class="ml-2" href="{% url 'password_reset' %}">Click Here!</a></small>
+    </div>
+  </div>
+  {% endblock content%}

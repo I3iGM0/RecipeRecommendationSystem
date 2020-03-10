@@ -1,0 +1,30 @@
+{% extends "HealthyLiving/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container">
+      <div class="ui card">
+        <a class="image" href="#">
+          <img src="{{ user.profile.image.url }}">
+        </a>
+        <div class="content">
+          <a class="header">{{ user.username }}</a>
+          <div class="meta">
+            <a>{{ user.email }}</a>
+          </div>
+        </div>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <fieldset class="form-group">
+              <legend class="border-bottom mb-4">Profile Info</legend>
+              {{ u_form|crispy }}
+              {{ p_form|crispy }}
+          </fieldset>
+          <div class="form-group">
+              <button class="btn btn-outline-info" type="submit">Update</button>
+          </div>
+      </form>
+    </div>
+{% endblock content %}

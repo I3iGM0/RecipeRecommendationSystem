@@ -1,0 +1,224 @@
+{% extends "HealthyLiving/base.html" %}
+
+{% block content%}
+
+<div id="data" class="container">
+    <h4 class="display-4 font-italic">Overview of Fitbit Data</h4>
+    <a id="link" href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22BKK2&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Ffitbit%2F&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800" class="btn btn-primary my-2">
+    Update!</a>
+    <div class="jumbotron p-3 p-md-5 text-white rounded">
+      <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="row mb-2">
+      <div class="col-md-6">
+        <div class="card flex-md-row mb-4 box-shadow h-md-250" style="background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);">
+          <div class="card-body d-flex flex-column align-items-start">
+            <div class=" ui red ui horizontal statistic">
+              <div class="value calories">
+              </div>
+              <div class="label">
+                Calories burnt! 🔥
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card flex-md-row mb-4 box-shadow h-md-250" style="background-image: linear-gradient(to top, #37ecba 0%, #72afd3 100%);">
+          <div class="card-body d-flex flex-column align-items-start">
+            <div class="ui horizontal statistic">
+              <div class="value text-danger steps">
+              </div>
+              <div class="label">
+                Steps taken! 🚶
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="jumbotron p-3 p-md-5 text-white rounded">
+      <canvas id="myChart2"></canvas>
+    </div>
+
+</div>
+
+  <script>
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
+      today = yyyy + '-' + mm + '-' + dd;
+
+      var obj
+      var url = window.location.href;
+      var access_token = url.split("#")[1].split("=")[1].split("&")[0];
+      var userId = url.split("#")[1].split("=")[2].split("&")[0];
+      console.log(access_token);
+
+      //Sleep
+      $(document).ready(function(){
+        $(".ml-2").trigger('click');
+      })
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/sleep/date/2020-02-18.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data.summary);
+            drawchart(data.summary.stages.deep,data.summary.stages.light,data.summary.stages.rem,data.summary.stages.wake)
+            senddata(data.summary)
+          },
+          error: function (error) {
+            alert(error);
+          }
+      });
+    });
+      //Steps
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/activities/steps/date/2020-02-19/7d.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data["activities-steps"]);
+            drawchart2(data["activities-steps"],2,"steps")
+          }
+      });
+    });
+
+      //Calories
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/activities/date/2019-12-01.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data.summary.calories.total);
+            console.log(data.summary.steps);
+            console.log(data.summary);
+            senddata1(data.summary)
+          }
+      });
+    });
+
+      function drawchart(deep,light,rem,wake){
+          new Chart(document.getElementById("myChart"), {
+          type: 'doughnut',
+          data: {
+            labels: ["Deep", "Light", "REM", "Wake"],
+            datasets: [
+              {
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9"],
+                data: [deep,light,rem,wake]
+              }
+            ]
+          },
+          options: {
+              responsive: true,
+              legend: {
+                position: 'top',
+              },
+              title: {
+                display: true,
+                text: 'Sleep Chart'
+              },
+              animation: {
+                animateScale: true,
+                animateRotate: true
+              }
+            }
+          });
+        };
+
+      function drawchart2(Data){
+            new Chart(document.getElementById("myChart2"), {
+                  type: 'line',
+                  data: {
+                    labels: [
+                    Data["0"]["dateTime"],
+                    Data["1"]["dateTime"],
+                    Data["2"]["dateTime"],
+                    Data["3"]["dateTime"],
+                    Data["4"]["dateTime"],
+                    Data["5"]["dateTime"],
+                    Data["6"]["dateTime"]],
+                    datasets: [{
+                      label: "Number of Steps in the last 7 Days",
+                      backgroundColor: "#8e5ea2",
+                      borderColor: "#8e5ea2",
+                      data: [
+                      Data["0"]["value"],
+                      Data["1"]["value"],
+                      Data["2"]["value"],
+                      Data["3"]["value"],
+                      Data["4"]["value"],
+                      Data["5"]["value"],
+                      Data["6"]["value"]],
+                    }]
+                  },
+                  options: {
+                    legend: {
+                      display: true,
+                      position: 'top',
+                      labels: {
+                        boxWidth: 80,
+                        fontColor: 'black'
+                      }
+                    }
+                  }
+              });
+          };
+
+      function senddata(data){
+        $.ajax({
+          url : "{% url 'fitbit1' %}",
+          method : "POST",
+          data : {
+                  "Deep":data.stages.deep,
+                  "Light":data.stages.light,
+                  "REM":data.stages.rem,
+                  "Wake":data.stages.wake,
+                  "date":today,
+                  "totalMinutesAsleep":data.totalMinutesAsleep,
+                  "csrfmiddlewaretoken" : "{{csrf_token}}"
+                 },
+          success : function (data){
+            console.log(data)
+          }
+        })
+      }
+
+      function senddata1(data){
+        $.ajax({
+          url : "{% url 'fitbit2' %}",
+          method : "POST",
+          data : {
+                  "Calories":data.calories.total,
+                  "Steps":data.steps,
+                  "date":today,
+                  "csrfmiddlewaretoken" : "{{csrf_token}}"
+                 },
+          success : function (data){
+            console.log(data)
+            $(".calories").html(
+              "<small class='text-danger'>" + data.calories + "</small>"
+            )
+            $(".steps").html(
+              "<small class='text-info'>" + data.Steps + "</small>"
+            )
+          }
+        })
+      }
+
+</script>
+{% endblock content%}
