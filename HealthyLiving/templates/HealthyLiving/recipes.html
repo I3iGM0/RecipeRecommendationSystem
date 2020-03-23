@@ -1,0 +1,74 @@
+{% extends "HealthyLiving/base.html" %}
+
+{% block content%}
+  <h1>Recipe Page!</h1>
+  <div class="container">
+    <div class="album py-5 bg-light">
+        <div class="container">
+
+          <div class="row">
+            {% for recipe in Recipe %}
+
+            <div class="col-md-4">
+              <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                  <p class="card-text">{{recipe.Title}}</p>
+                  <p class="card-text">{{recipe.avgRating}}</p>
+
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                      <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
+                    </div>
+                    <small class="text-muted">9 mins</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+      </div>
+  </div>
+
+
+    {% if is_paginated %}
+
+      {% if page_obj.has_previous %}
+        <a class="btn btn-outline-primary mb-4" href="?page=1">First</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a class="btn btn-primary mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a class="btn btn-outline-primary mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="btn btn-outline-primary mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% endif %}
+
+    {% endif %}
+
+
+    <a class="scroll-to-top rounded" href="#">
+      <i class="fa fa-angle-up"></i>
+    </a>
+
+<script>
+
+// Scroll to top button appear
+$(document).on('scroll', function() {
+  var scrollDistance = $(this).scrollTop();
+  if (scrollDistance > 100) {
+    $('.scroll-to-top').fadeIn();
+  } else {
+    $('.scroll-to-top').fadeOut();
+  }
+});
+</script>
+
+
+{% endblock content%}

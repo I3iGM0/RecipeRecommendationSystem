@@ -2,20 +2,37 @@
 {% load crispy_forms_tags %}
 
   {% block content%}
-  <div class="content-section">
-    <form method="POST">
-      {% csrf_token %}
-      <h3>Login!</h3>
-      <fieldset class="form-group">
-        {{ form |crispy}}
-      </fieldset>
-      <div class="form-group">
-        <button class="btn btn-primary" name="button" type="submit">Login!</button>
+  <div class="row justify-content-center">
+
+    <div class="col-xl-10 col-lg-12 col-md-9">
+
+      <div class="card border-0 shadow ">
+        <div class="card-body p-0">
+              <div class="p-5">
+                <div class="text-center">
+                  <h1 class="h4 mb-4">Welcome Back!</h1>
+                </div>
+                <form method="POST">
+                  {% csrf_token %}
+                  <fieldset class="form-group">
+                    {{ form |crispy}}
+                  </fieldset>
+                  <div class="form-group">
+                    <button class="btn btn-primary btn-user btn-block" name="button" type="submit">Login!</button>
+                  </div>
+                </form>
+                <hr>
+                <div class="text-center">
+                  <a class="small" href="{% url 'password_reset' %}">Forgot Password?</a>
+                </div>
+                <div class="text-center">
+                  <a class="small" href="{% url 'register' %}">Create an Account!</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </form>
-    <div class="border-top pt-3">
-      <small class="text-muted">Need an account? <a class="ml-2" href="{% url 'register' %}">Sign Up!</a></small>
-      <small class="text-muted">Forgot Password? <a class="ml-2" href="{% url 'password_reset' %}">Click Here!</a></small>
-    </div>
-  </div>
+
+
   {% endblock content%}

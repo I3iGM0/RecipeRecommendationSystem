@@ -1,25 +1,41 @@
 {% extends "HealthyLiving/base.html" %}
 
 {% block content %}
+
+  {% if user.is_authenticated %}
+
+
+  <div class="container">
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Text</h1>
+        <p class="lead">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+      </div>
+    <div class="card-columns" display: inline-block>
+
+      {% for recipe in Recipe %}
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">{{recipe.Title}}</h5>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{recipe.categories}}</h5>
+            <p class="card-text"><small class="text-muted">{{recipe.avgRating}}</small></p>
+            <a href="" class="btn btn-primary">View Recipe</a>
+          </div>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+  {% else %}
   <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
       <h1 class="display-4">Text</h1>
       <p class="lead">
         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
     </div>
-    <div class="container">
-      <div class="card-deck mb-3 text-center">
-        {% for post in posts %}
-        <div class="card mb-4 box-shadow">
-          <div class="card-header">
-            <h4 class="my-0 font-weight-normal">{{ post.author }}</h4>
-          </div>
-          <div class="card-body">
-            <h1 class="card-title pricing-card-title">{{ post.title }}</h1>
-            <p class="article-content">{{ post.content }}</p>
-          </div>
-          <small class="text-muted">{{ post.date_posted }}</small>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
+  {% endif %}
+
+
 {% endblock content %}

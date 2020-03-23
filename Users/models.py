@@ -27,3 +27,6 @@ class HealthData(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Health Data'
+
+    class Meta:
+       ordering = ('-date',)

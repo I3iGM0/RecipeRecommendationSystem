@@ -2,50 +2,94 @@
 
 {% block content%}
 
-<div id="data" class="container">
-    <h4 class="display-4 font-italic">Overview of Fitbit Data</h4>
-    <a id="link" href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22BKK2&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Ffitbit%2F&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800" class="btn btn-primary my-2">
-    Update!</a>
-    <div class="jumbotron p-3 p-md-5 text-white rounded">
-      <canvas id="myChart"></canvas>
-    </div>
+<h1 class="text-center">{{ Date }}
+</h1>
 
-    <div class="row mb-2">
-      <div class="col-md-6">
-        <div class="card flex-md-row mb-4 box-shadow h-md-250" style="background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);">
-          <div class="card-body d-flex flex-column align-items-start">
-            <div class=" ui red ui horizontal statistic">
-              <div class="value calories">
-              </div>
-              <div class="label">
-                Calories burnt! 🔥
-              </div>
-            </div>
+<div class="row">
+  <!-- Area Chart -->
+  <div class="col-xl-7 col-lg-7">
+    <div class="card shadow mb-4">
+      <!-- Card Header - Dropdown -->
+      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="font-weight-bold mb-1">Number of Step in the last 7 days</h6>
+      </div>
+      <!-- Card Body -->
+      <div class="card-body">
+        <div class="chart-area">
+          <canvas id="myChart2"></canvas>
+        </div>
+      </div>
+      <a id="link" href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22BKK2&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Ffitbit%2F&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800" class="btn btn-primary ">
+        Update!</a>
+    </div>
+  </div>
+
+  <!-- Pie Chart -->
+  <div class="col-xl-5 col-lg-7">
+    <div class="card shadow mb-4">
+      <!-- Card Header - Dropdown -->
+      <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="font-weight-bold mb-1">Sleep Analysis</h6>
+      </div>
+      <!-- Card Body -->
+      <div class="card-body">
+        <div class="chart-area">
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="mt-4 text-center small">
+          <span class="mr-2">
+            <i class="fa fa-circle text-deep" style="color: "></i> Deep
+          </span>
+          <span class="mr-2">
+            <i class="fa fa-circle text-light"></i> Light
+          </span>
+          <span class="mr-2">
+            <i class="fa fa-circle text-rem"></i> REM
+          </span>
+          <span class="mr-2">
+            <i class="fa fa-circle text-wake"></i> Wake
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-6 col-md-6 mb-4">
+    <div class="card border-left-success shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col mr-2">
+            <div class="font-weight-bold text-uppercase mb-1">
+              Steps taken! 🚶</div>
+            <div class="h5 mb-0 font-weight-bold ">{{Steps}}</div>
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card flex-md-row mb-4 box-shadow h-md-250" style="background-image: linear-gradient(to top, #37ecba 0%, #72afd3 100%);">
-          <div class="card-body d-flex flex-column align-items-start">
-            <div class="ui horizontal statistic">
-              <div class="value text-danger steps">
-              </div>
-              <div class="label">
-                Steps taken! 🚶
-              </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6 col-md-6 mb-4">
+    <div class="card border-left-danger shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-uppercase mb-1">
+              Calories burnt! 🔥
             </div>
+            <div class="h5 mb-0 font-weight-bold  ">{{Calories}}</div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="jumbotron p-3 p-md-5 text-white rounded">
-      <canvas id="myChart2"></canvas>
-    </div>
-
+  </div>
 </div>
 
   <script>
+      $(document).ready(function(){
+        drawchart({{ Deep }},{{Light}},{{ReM}},{{Wake}})
+      })
       var today = new Date();
       var dd = String(today.getDate()).padStart(2, '0');
       var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -60,22 +104,19 @@
 
       //Sleep
       $(document).ready(function(){
-        $(".ml-2").trigger('click');
-      })
-      $(document).ready(function(){
         $.ajax({
-          url: "https://api.fitbit.com/1.2/user/" + userId + "/sleep/date/2020-02-18.json",
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/sleep/date/2020-03-17.json",
           method:'GET',
           beforeSend: function(xhr){
             xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
           },
           success: function(data){
             console.log(data.summary);
-            drawchart(data.summary.stages.deep,data.summary.stages.light,data.summary.stages.rem,data.summary.stages.wake)
+            //drawchart(data.summary.stages.deep,data.summary.stages.light,data.summary.stages.rem,data.summary.stages.wake)
             senddata(data.summary)
           },
           error: function (error) {
-            alert(error);
+            alert("SOMETINHG WRONG");
           }
       });
     });
@@ -115,7 +156,7 @@
           new Chart(document.getElementById("myChart"), {
           type: 'doughnut',
           data: {
-            labels: ["Deep", "Light", "REM", "Wake"],
+            //labels: ["Deep", "Light", "REM", "Wake"],
             datasets: [
               {
                 backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9"],
@@ -129,7 +170,7 @@
                 position: 'top',
               },
               title: {
-                display: true,
+                display: false,
                 text: 'Sleep Chart'
               },
               animation: {
@@ -153,8 +194,6 @@
                     Data["5"]["dateTime"],
                     Data["6"]["dateTime"]],
                     datasets: [{
-                      label: "Number of Steps in the last 7 Days",
-                      backgroundColor: "#8e5ea2",
                       borderColor: "#8e5ea2",
                       data: [
                       Data["0"]["value"],
@@ -168,7 +207,7 @@
                   },
                   options: {
                     legend: {
-                      display: true,
+                      display: false,
                       position: 'top',
                       labels: {
                         boxWidth: 80,
