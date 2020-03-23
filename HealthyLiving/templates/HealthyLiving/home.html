@@ -22,7 +22,7 @@
           <div class="card-body">
             <h5 class="card-title">{{recipe.categories}}</h5>
             <p class="card-text"><small class="text-muted">{{recipe.avgRating}}</small></p>
-            <a href="" class="btn btn-primary">View Recipe</a>
+            <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
           </div>
         </div>
       {% endfor %}

@@ -17,7 +17,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
 
-df = pd.read_csv("/Users/mohamed/Documents/Recommendation/MasterRecipeFile.csv" ,sep = ',')
+df = pd.read_csv("/Users/mohamed/Documents/Recommendation/CleanedRecipe.csv" ,sep = ',')
 df = df[['title','categories','ingredients','directions','calories','words']]
 custom  = df[['title','categories','ingredients','directions','calories']]
 #Create matrix
@@ -43,7 +43,7 @@ def recommend(food):
         foodarray.append([i,array[i],ls[0][i]])
 
     foodarray.sort(key=lambda x:x[2],reverse=True)
-    return foodarray[1:6]
+    return foodarray[1:11]
 
 
 
@@ -78,9 +78,8 @@ def home(request):
         return render(request,'HealthyLiving/home.html',foodContext)
 
     except RecentlyViewed.DoesNotExist:
-        print("Doesnt exist")
         foodContext = {
-            'Recipe' : 'Hi!'
+            'Recipe' : 'None'
         }
 
         return render(request,'HealthyLiving/home.html',foodContext)
