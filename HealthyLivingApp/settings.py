@@ -121,6 +121,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+RECOMMEND_DIR = os.path.join(BASE_DIR, 'recommend')
 MEDIA_ROOT = os.path.join(BASE_DIR,'Media')
 MEDIA_URL= '/Media/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

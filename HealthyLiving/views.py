@@ -4,6 +4,9 @@ from django.core import serializers
 from django.views.generic import ListView, DetailView
 from django.utils.timezone import now
 from django.utils.timezone import datetime
+import os
+from HealthyLivingApp.settings import RECOMMEND_DIR
+url = os.path.join(RECOMMEND_DIR, 'CleanedRecipe.csv')
 
 #Import models
 from Users.models import Profile,HealthData
@@ -17,7 +20,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
 
-df = pd.read_csv("/Users/mohamed/Documents/Recommendation/CleanedRecipe.csv" ,sep = ',')
+df = pd.read_csv(url ,sep = ',')
 df = df[['title','categories','ingredients','directions','calories','words']]
 custom  = df[['title','categories','ingredients','directions','calories']]
 #Create matrix
@@ -98,6 +101,10 @@ class PostDetailView(DetailView):
     model = Recipe
 
 def recentlyVisited(request , pk):
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'recieved' : 'nope'
+        })
     recipe = Recipe.objects.get(pk = request.POST['recipeID'])
     recipeName = recipe.Title
     user = request.user
@@ -150,8 +157,6 @@ def fitbit(request):
             'Totaltime' : 0,
         }
         return render(request,'HealthyLiving/fitbit.html',data)
-
-
 
 def fitbit1(request):
     #Grab the data from the JSON PUT request from ajax in front end
