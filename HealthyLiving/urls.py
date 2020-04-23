@@ -1,14 +1,17 @@
 from django.urls import path
+from django.conf.urls import url
 from .views import PostListView, PostDetailView
 from . import views
 
 urlpatterns = [
     path('', views.home, name='healthyliving-home'),
-    path('test/', views.test, name='healthyliving-test'),
-    path('recipes/', PostListView.as_view(), name='healthyliving-recipes'),
+    url(r'^recipes/$', PostListView.as_view(), name='healthyliving-recipes'),
     path('recipes/<int:pk>/', views.getRecipe, name='getRecipe'),
     path('recipes/<int:pk>/recentlyVisited', views.recentlyVisited, name='recentlyVisited'),
-    path('fitbit/', views.fitbit, name='fitbit'),
-    path('fitbit1/', views.fitbit1, name='fitbit1'),
-    path('fitbit2/', views.fitbit2, name='fitbit2'),
+    path('recipes/<int:pk>/favourites', views.favourites, name='favourites'),
+    path('healthdata/', views.healthdata, name='healthdata'),
+    path('healthdata1/', views.healthdata1, name='healthdata1'),
+    path('healthdata2/', views.healthdata2, name='healthdata2'),
+    path('test/', views.test, name='test'),
+
 ]

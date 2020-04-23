@@ -13,7 +13,6 @@ class Profile(models.Model):
         return f'{self.user.username} Profile'
 
 
-
 class HealthData(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(blank=False, null=True)

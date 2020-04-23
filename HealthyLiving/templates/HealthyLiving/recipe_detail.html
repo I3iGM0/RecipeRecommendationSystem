@@ -3,15 +3,58 @@
 {% block content %}
 
     <div class="container">
-      <div class="card-columns" display: inline-block>
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">{{recipe.Title}}</h5>
+      <div class="card booking-card">
+        <div class="view overlay">
+          <!--
+          <img class="card-img-top" alt="Card image cap">
+          -->
+          <a href="#!">
+            <div class="mask rgba-white-slight"></div>
+          </a>
+        </div>
+
+        <div class="card-body">
+          <h1 class="card-title font-weight-bold"><a>{{recipe.Title}}</a></h1>
+          <div class="container">
+            <div class="row">
+              <div class="col-6">
+                <p class="card-text">
+                  Ratings - {{recipe.avgRating}} ({{recipe.totalRatings}})
+                </p>
+                <ul class="list-unstyled list-inline rating mb-0" id="stars">
+                </ul>
+             </div>
+              <div class="col-2">
+              </div>
+              <div class="col-4">
+                {% if user.is_authenticated %}
+                <nav>
+                  <ul style="list-style: none; margin: 0; padding: 0;">
+                    {% if favourite %}
+                      <li><i class="fas fa-heart fa-5x" style="color:red"></i></li>
+                    {% else %}
+                      <li><i class="fas fa-heart fa-5x" style="color:black"></i></li>
+                    {% endif %}
+                  </ul>
+                </nav>
+                {% else %}
+                  <p>
+                    Login to Favourite!!!
+                  </p>
+                {% endif %}
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <h5 class="card-title">{{recipe.categories}}</h5>
-            <p class="card-text"><small class="text-muted">{{recipe.avgRating}}</small></p>
-          </div>
+
+          <h3 class="card-title font-weight-bold"><a>Ingredients</a></h3>
+          <hr class="my-4">
+          <p class="card-text">{{recipe.ingredients}}</p>
+          <h3 class="card-title font-weight-bold"><a>Directions</a></h3>
+          <hr class="my-4">
+          <p class="card-text">{{recipe.directions}}</p>
+          <hr class="my-4">
+          <p class="card-text"> Categories - [{{recipe.categories}}]</p>
+
         </div>
       </div>
     </div>
@@ -31,5 +74,31 @@
           }
         })
       })
+
+      $('nav i').on('click', function () {
+        $.ajax({
+          url : "{% url 'favourites' recipe.id %}",
+          method : "POST",
+          data : {
+                  "recipeID" : {{recipe.id}},
+                  "csrfmiddlewaretoken" : "{{csrf_token}}"
+                 },
+          success : function (data){
+            console.log(data)
+          }
+        })
+      });
+
+      $(document).ready(function(){
+        if ({{recipe.avgRating}} <=0){
+          for(let i=0;i < 5; i++){
+            $("#stars").append('<li class="list-inline-item mr-0"><i class="fas fa-star "></i></li>')
+          }
+        }else{
+        for(let i=0;i < 5; i++){
+          $("#stars").append('<li class="list-inline-item mr-0"><i class="fas fa-star amber-text"></i></li>')
+        }}
+      })
+
     </script>
 {% endblock content %}

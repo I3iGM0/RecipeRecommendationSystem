@@ -12,6 +12,7 @@ class Recipe(models.Model):
     directions = models.TextField()
     calories = models.IntegerField()
     words = models.TextField()
+    course = models.TextField(default="")
     onestarRating = models.IntegerField(default = 0)
     twostarRating = models.IntegerField(default = 0)
     threestarRating = models.IntegerField(default = 0)
@@ -37,11 +38,17 @@ class RecentlyViewed(models.Model):
 class Favourites(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipeID = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    date = models.DateField(blank=False, null=True)
-    rating = models.IntegerField(default = 0)
+    Date = models.DateField(blank=False, null=True)
+    course = models.TextField(default="")
+
 
     def __str__(self):
        return self.recipeID.Title
 
     class Meta:
-        ordering = ('-rating',)
+        ordering = ('-Date',)
+
+class recommended(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipeId = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    date = models.DateField(blank=False, null=True)

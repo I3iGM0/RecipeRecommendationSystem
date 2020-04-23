@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Recipe, RecentlyViewed
+from .models import *
 
 # Register your models here.
 admin.site.register(Recipe)
 admin.site.register(RecentlyViewed)
+admin.site.register(Favourites)

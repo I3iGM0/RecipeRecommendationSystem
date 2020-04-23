@@ -1,0 +1,267 @@
+{% extends "HealthyLiving/base.html" %}
+
+{% block content%}
+
+<div class="container text-center ">
+  <div class="row">
+    <div class="col-xl-12 col-lg-7">
+
+    <h1 class="text-center">{{ Date }}</h1>
+    <h3 class="text-center">Here is your daily activity {{user.username}}</h3>
+  </div>
+
+</div>
+
+  <div class="row">
+    <!-- Area Chart -->
+    <div class="col-xl-7 col-lg-7">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center">
+          <h6 class="font-weight-bold mb-1">Number of Step in the last 7 days</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="myChart2"></canvas>
+          </div>
+        </div>
+        <a id="link" href="https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=22BKK2&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fhealthdata%2F&scope=activity%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight&expires_in=604800" class="btn btn-primary ">
+          Update!</a>
+      </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-xl-5 col-lg-7">
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="font-weight-bold mb-1">Sleep Analysis</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div class="chart-area">
+            <canvas id="myChart"></canvas>
+          </div>
+          <div class="mt-4 text-center small">
+            <span class="mr-2">
+              <i class="fa fa-circle text-deep" style="color: "></i> Deep
+            </span>
+            <span class="mr-2">
+              <i class="fa fa-circle text-light"></i> Light
+            </span>
+            <span class="mr-2">
+              <i class="fa fa-circle text-rem"></i> REM
+            </span>
+            <span class="mr-2">
+              <i class="fa fa-circle text-wake"></i> Wake
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-6 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col mr-2">
+              <div class="font-weight-bold text-uppercase mb-1">
+                Steps taken! 🚶</div>
+              <div class="h5 mb-0 font-weight-bold ">{{Steps}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6 mb-4">
+      <div class="card border-left-danger shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-uppercase mb-1">
+                Calories burnt! 🔥
+              </div>
+              <div class="h5 mb-0 font-weight-bold  ">{{Calories}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+      $(document).ready(function(){
+        drawchart({{ Deep }},{{Light}},{{ReM}},{{Wake}})
+      })
+
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
+      today = yyyy + '-' + mm + '-' + dd;
+
+      var obj
+      var url = window.location.href;
+      var access_token = url.split("#")[1].split("=")[1].split("&")[0];
+      var userId = url.split("#")[1].split("=")[2].split("&")[0];
+      console.log(access_token);
+
+      //Sleep
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/sleep/date/2020-03-17.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data.summary);
+            //drawchart(data.summary.stages.deep,data.summary.stages.light,data.summary.stages.rem,data.summary.stages.wake)
+            senddata(data.summary)
+          },
+          error: function (error) {
+            alert("SOMETINHG WRONG");
+          }
+      });
+    });
+      //Steps
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/activities/steps/date/2020-02-19/7d.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data["activities-steps"]);
+            drawchart2(data["activities-steps"],2,"steps")
+          }
+      });
+    });
+
+      //Calories
+      $(document).ready(function(){
+        $.ajax({
+          url: "https://api.fitbit.com/1.2/user/" + userId + "/activities/date/2019-12-01.json",
+          method:'GET',
+          beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", 'Bearer ' + access_token);
+          },
+          success: function(data){
+            console.log(data.summary.calories.total);
+            console.log(data.summary.steps);
+            console.log(data.summary);
+            senddata1(data.summary)
+          }
+      });
+    });
+
+      function drawchart(deep,light,rem,wake){
+          new Chart(document.getElementById("myChart"), {
+          type: 'doughnut',
+          data: {
+            //labels: ["Deep", "Light", "REM", "Wake"],
+            datasets: [
+              {
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9"],
+                data: [deep,light,rem,wake]
+              }
+            ]
+          },
+          options: {
+              responsive: true,
+              legend: {
+                position: 'top',
+              },
+              title: {
+                display: false,
+                text: 'Sleep Chart'
+              },
+              animation: {
+                animateScale: true,
+                animateRotate: true
+              }
+            }
+          });
+        };
+
+      function drawchart2(Data){
+            new Chart(document.getElementById("myChart2"), {
+                  type: 'line',
+                  data: {
+                    labels: [
+                    Data["0"]["dateTime"],
+                    Data["1"]["dateTime"],
+                    Data["2"]["dateTime"],
+                    Data["3"]["dateTime"],
+                    Data["4"]["dateTime"],
+                    Data["5"]["dateTime"],
+                    Data["6"]["dateTime"]],
+                    datasets: [{
+                      borderColor: "#8e5ea2",
+                      data: [
+                      Data["0"]["value"],
+                      Data["1"]["value"],
+                      Data["2"]["value"],
+                      Data["3"]["value"],
+                      Data["4"]["value"],
+                      Data["5"]["value"],
+                      Data["6"]["value"]],
+                    }]
+                  },
+                  options: {
+                    legend: {
+                      display: false,
+                      position: 'top',
+                      labels: {
+                        boxWidth: 80,
+                        fontColor: 'black'
+                      }
+                    }
+                  }
+              });
+          };
+
+      function senddata(data){
+        $.ajax({
+          url : "{% url 'healthdata1' %}",
+          method : "POST",
+          data : {
+                  "Deep":data.stages.deep,
+                  "Light":data.stages.light,
+                  "REM":data.stages.rem,
+                  "Wake":data.stages.wake,
+                  "date":today,
+                  "totalMinutesAsleep":data.totalMinutesAsleep,
+                  "csrfmiddlewaretoken" : "{{csrf_token}}"
+                 },
+          success : function (data){
+            console.log(data)
+          }
+        })
+      }
+
+      function senddata1(data){
+        $.ajax({
+          url : "{% url 'healthdata2' %}",
+          method : "POST",
+          data : {
+                  "Calories":data.calories.total,
+                  "Steps":data.steps,
+                  "date":today,
+                  "csrfmiddlewaretoken" : "{{csrf_token}}"
+                 },
+          success : function (data){
+            console.log(data)
+          }
+        })
+      }
+
+</script>
+{% endblock content%}

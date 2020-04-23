@@ -4,15 +4,17 @@ from django.core import serializers
 from django.views.generic import ListView, DetailView
 from django.utils.timezone import now
 from django.utils.timezone import datetime
+from django.core.paginator import Paginator
 import os
+import time
 from HealthyLivingApp.settings import RECOMMEND_DIR
-url = os.path.join(RECOMMEND_DIR, 'CleanedRecipe.csv')
+url = os.path.join(RECOMMEND_DIR, 'MasterRecipeFile.csv')
 
 #Import models
 from Users.models import Profile,HealthData
-from .models import Recipe,RecentlyViewed
+from .models import *
 from Users.models import Profile
-
+from .filters import searchFilter
 #import python libraries
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
@@ -20,62 +22,82 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
 
-df = pd.read_csv(url ,sep = ',')
-df = df[['title','categories','ingredients','directions','calories','words']]
-custom  = df[['title','categories','ingredients','directions','calories']]
-#Create matrix
-count = CountVectorizer()
-count_matrix = count.fit_transform(df['words'])
-#cosine_sim = cosine_similarity(count_matrix, count_matrix)
 
-array = []
-for i in custom['title']:
-    array.append(i)
+df = pd.read_csv(url,sep = ',')
+df.categories.fillna(' ', inplace=True)
+df.isna().sum()
+#df.info()
+df.set_index('title', inplace = True)
+
+custom  = pd.read_csv(url ,sep = ',')
+custom1  = pd.read_csv(url ,sep = ',')
+custom.set_index('title', inplace = True)
 
 def recommend(food):
-    idx = array.index(food)
-    #Compute similarity
-    cosine_sim = cosine_similarity(count_matrix[idx], count_matrix)
-    cosine_sim
-    #Store the similarity
+
+    course = custom.loc[food,'course']
+    newtable = custom1[(custom1['course'] == course)]
+    array = []
+    #Populate the array first with the titles of the recipes.
+    for i in newtable['title']:
+        array.append(i)
+
+    #Gets the ID of the recipe
+    recipeId = array.index(food)
+    #Initialise the vector for words
+    countVector = CountVectorizer()
+    #Create a matrix which contains a vector count for each recipe
+    VectorFreq = countVector.fit_transform(newtable['words'])
+
+    #Compute the cosine similarity with the recipe provided against the other recipes in the dataset
+    #Prevents the need for computing the entire matrix
+    cos_Sim = cosine_similarity(VectorFreq[recipeId], VectorFreq)
+
+    #Creates an array which holds the similarity values for all the recipes
     ls = []
-    ls = cosine_sim
-    #Create a 2D array for recipe alongside its similarity
+    ls = cos_Sim
+
+    #Create a 2D array which holds a recipe and its corresponding similarity to a recipe recommended
     foodarray = []
     for i in range(len(array)):
-        foodarray.append([i,array[i],ls[0][i]])
+        #Add to teh 2D array the recipe id,its title and its corresponding
+        #similarity value to the recipe we are comparing to
+        foodarray.append([array[i],ls[0][i]])
 
-    foodarray.sort(key=lambda x:x[2],reverse=True)
-    return foodarray[1:11]
-
-
+    #Use functional lamda to order the array by ascending cosine similarity value
+    foodarray.sort(key = lambda x:x[1],reverse=True)
+    #Only return a sub array of the 10 highest similar recipes
+    return foodarray[1:5]
 
 def home(request):
     if not request.user.is_authenticated:
         return render(request,'HealthyLiving/home.html')
 
+    fav = Favourites.objects.filter(user = request.user).latest('id')
+    print(fav)
+    print('fav' + str(Favourites.objects.filter(user = request.user, course = 'Other').latest('id')))
     try:
         #Check to see if the record exists by date to prevent duplicates
         recent = RecentlyViewed.objects.filter(user = request.user).latest('id')
-        #print(RecentlyViewed.objects.filter(user = request.user).last())
-        #print(RecentlyViewed.objects.filter(user = request.user).first())
-        print(recent)
-        #recent = RecentlyViewed.objects.filter(user = user)[0]
         ls = recommend(recent.recipeID.Title)
-        #print(ls)
         foodLs = []
+        favLs = []
         foodContext = {}
+        #Get recommendation based of user's browsing history
         for i in range(len(ls)):
-            id = int(ls[i][0] + 1)
-            #print(str(ls[i][0]))
-            #print(Recipe.objects.get(pk=id).directions)
-            #print(list(Recipe.objects.get(pk=id).categories.split(',')))
-            foodLs.append(Recipe.objects.get(pk=id))
-        #first = int(ls[0][0]+1)
-        #print(first)
-        #print(foodLs)
+            print(ls[i][0])
+            foodLs.append(Recipe.objects.get(Title = ls[i][0]))
+
+        #Get recommendation based of user's recently favourite recipe
+        favRecommend = recommend(fav.recipeID.Title)
+        for i in range(len(favRecommend)):
+            print(favRecommend[i][0])
+            favLs.append(Recipe.objects.get(Title = favRecommend[i][0]))
+
         foodContext = {
-            'Recipe' : list(foodLs)
+            'Course' : recent.recipeID.course,
+            'Recipe' : list(foodLs),
+            'Favourite' : list(favLs)
         }
 
         return render(request,'HealthyLiving/home.html',foodContext)
@@ -87,8 +109,17 @@ def home(request):
 
         return render(request,'HealthyLiving/home.html',foodContext)
 
+def search(request):
+    recipe_filter = searchFilter(request.GET, queryset=Recipe.objects.all())
+    return render(request,'HealthyLiving/search.html', {'filter':recipe_filter,})
+
 def test(request):
     return render(request,'HealthyLiving/test.html')
+
+def searchView1(request):
+    return JsonResponse({
+        'Items': list( Recipe.objects.values()),
+    })
 
 class PostListView(ListView):
     model = Recipe
@@ -96,6 +127,26 @@ class PostListView(ListView):
     queryset = Recipe.objects.all()
     context_object_name = 'Recipe'
     paginate_by = 9
+
+    def get_queryset(self):
+        title = self.request.GET.get('q')
+        course = self.request.GET.get('filter')
+        print(title)
+        print(course)
+        if course == None:
+            return Recipe.objects.all()
+
+        if title != '':
+            if (self.request.GET.get('filter') == 'All'):
+                return Recipe.objects.filter(Title__contains=self.request.GET.get('q'))
+            else:
+                return Recipe.objects.filter(Title__contains=self.request.GET.get('q'),
+                 course__contains=self.request.GET.get('filter'))
+        else:
+            if (self.request.GET.get('filter') == 'All'):
+                return Recipe.objects.filter(Title__contains=self.request.GET.get('q'))
+            else:
+                return Recipe.objects.filter(course__contains=self.request.GET.get('filter'))
 
 class PostDetailView(DetailView):
     model = Recipe
@@ -122,14 +173,46 @@ def recentlyVisited(request , pk):
             'recieved' : 'nope'
         })
 
+def favourites(request , pk):
+    user = request.user
+    recipe = Recipe.objects.get(pk = request.POST['recipeID'])
+    recipeName = recipe.Title
+
+    try:
+        #Check to see if the record exists by date to prevent duplicates
+        Favourites.objects.get(recipeID = recipe ,user=request.user)
+        return JsonResponse({
+            'recieved' : 'Yes but record already exists',
+            'recipe' : recipeName
+        })
+    except Favourites.DoesNotExist:
+        newFav = Favourites(recipeID = recipe ,user=request.user,Date = datetime.now(), course = recipe.course)
+        newFav.save()
+        return JsonResponse({
+            'recieved' : 'Yes but record doesnt exist so create',
+            'recipe' : recipeName
+        })
+
 def getRecipe(request, pk):
+    user = request.user
     recipe = Recipe.objects.get(pk = pk)
-    return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe})
+
+    if request.user.is_authenticated:
+        fav = False
+        try:
+            #Check to see if the record exists by date to prevent duplicates
+            Favourites.objects.get(recipeID = recipe ,user=request.user)
+            fav = True
+        except Favourites.DoesNotExist:
+            fav = False
+        return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,'favourite':fav})
+    else:
+        return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,})
 
 def recipes(request):
     return render(request,'HealthyLiving/recipes.html',foodContext)
 
-def fitbit(request):
+def healthdata(request):
     try:
         Hd = HealthData.objects.filter(user = request.user).latest('id')
         data = {
@@ -143,7 +226,7 @@ def fitbit(request):
             'Totaltime' : Hd.Totaltime,
         }
 
-        return render(request,'HealthyLiving/fitbit.html',data)
+        return render(request,'HealthyLiving/healthdata.html',data)
 
     except HealthData.DoesNotExist:
         data = {
@@ -156,9 +239,9 @@ def fitbit(request):
             'Wake' : 0,
             'Totaltime' : 0,
         }
-        return render(request,'HealthyLiving/fitbit.html',data)
+        return render(request,'HealthyLiving/healthdata.html',data)
 
-def fitbit1(request):
+def healthdata1(request):
     #Grab the data from the JSON PUT request from ajax in front end
     user = request.user
     Deep = request.POST['Deep']
@@ -194,7 +277,7 @@ def fitbit1(request):
             'totaltime' : totalMinutesAsleep
         })
 
-def fitbit2(request):
+def healthdata2(request):
     user = request.user
     calories = request.POST['Calories']
     Steps = request.POST['Steps']

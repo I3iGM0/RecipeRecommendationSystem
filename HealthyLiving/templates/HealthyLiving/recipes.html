@@ -1,19 +1,52 @@
 {% extends "HealthyLiving/base.html" %}
 
 {% block content%}
-  <h1>Recipe Page!</h1>
   <div class="container">
+    
+    <div class="col-lg-12 mx-auto">
+      <div class="p-5 rounded shadow">
+        <h1 class="card-text" >Search for recipe!</h1>
+        <form  action="" method="get">
+          <div class="form-row">
+            <div class="col">
+              <div class="md-form active-cyan-2 mb-3">
+                <input type="text" name="q" placeholder="Search Recipe" value="{{ request.GET.q }}" class="form-control">
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-5">
+              <div class="md-form active-cyan-2 mb-3">
+                <select name="filter" class="form-control">
+                    <option value="All">All</option>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Other">Other</option>
+                    <option value="Side">Side</option>
+                    <option value="Dessert">Dessert</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="md-form active-cyan-2 mb-3">
+                <input type="submit" value="Search" class="btn btn-primary">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
     <div class="album py-5 bg-light">
         <div class="container">
-
           <div class="row">
             {% for recipe in Recipe %}
-
             <div class="col-md-4">
               <div class="card mb-4 shadow-sm">
                 <div class="card-body">
                   <p class="card-text">{{recipe.Title}}</p>
-                  <p class="card-text">{{recipe.avgRating}}</p>
                   <div class="d-flex justify-content-between align-items-center">
                     <div class="btn-group">
                       <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
@@ -23,14 +56,21 @@
               </div>
             </div>
             {% endfor %}
-
           </div>
         </div>
       </div>
   </div>
 
 
-    {% if is_paginated %}
+    {% if request.GET.q %}
+      {% if page_obj.has_previous %}
+        <a class="btn btn-outline-primary mb-4" href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number}}">Prev</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a class="btn btn-outline-primary mb-4" href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+
+    {% else %}
 
       {% if page_obj.has_previous %}
         <a class="btn btn-outline-primary mb-4" href="?page=1">First</a>
@@ -47,9 +87,7 @@
       {% if page_obj.has_next %}
         <a class="btn btn-outline-primary mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
       {% endif %}
-
     {% endif %}
-
 
     <a class="scroll-to-top rounded" href="#">
       <i class="fa fa-angle-up"></i>
