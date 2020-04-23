@@ -48,6 +48,20 @@ class Favourites(models.Model):
     class Meta:
         ordering = ('-Date',)
 
+class Rated(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipeID = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    Date = models.DateField(blank=False, null=True)
+    course = models.TextField(default="")
+    rating = models.IntegerField(default = 0)
+
+
+    def __str__(self):
+       return self.recipeID.Title
+
+    class Meta:
+        ordering = ('-rating',)
+
 class recommended(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     recipeId = models.ForeignKey(Recipe, on_delete=models.CASCADE)

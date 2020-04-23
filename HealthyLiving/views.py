@@ -193,6 +193,30 @@ def favourites(request , pk):
             'recipe' : recipeName
         })
 
+def rating(request , pk):
+    user = request.user
+    recipe = Recipe.objects.get(pk = request.POST['recipeID'])
+    rating = request.POST['rating']
+    recipeName = recipe.Title
+    print(Rated.objects.all().order_by('-rating'))
+    reciperecord = Recipe.objects.get(pk=request.POST['recipeID'])
+    reciperecord.avgRating = rating  # change field
+    reciperecord.save() # this will update only
+    try:
+        #Check to see if the record exists by date to prevent duplicates
+        Rated.objects.get(recipeID = recipe ,user=request.user)
+        return JsonResponse({
+            'recieved' : 'Yes but record already exists',
+            'recipe' : recipeName
+        })
+    except Rated.DoesNotExist:
+        newrating = Rated(recipeID = recipe ,user=request.user,Date = datetime.now(), course = recipe.course, rating = rating )
+        newrating.save()
+        return JsonResponse({
+            'recieved' : 'Yes but record doesnt exist so create',
+            'recipe' : recipeName
+        })
+
 def getRecipe(request, pk):
     user = request.user
     recipe = Recipe.objects.get(pk = pk)

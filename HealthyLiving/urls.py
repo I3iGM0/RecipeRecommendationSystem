@@ -9,6 +9,7 @@ urlpatterns = [
     path('recipes/<int:pk>/', views.getRecipe, name='getRecipe'),
     path('recipes/<int:pk>/recentlyVisited', views.recentlyVisited, name='recentlyVisited'),
     path('recipes/<int:pk>/favourites', views.favourites, name='favourites'),
+    path('recipes/<int:pk>/rating', views.rating, name='rating'),
     path('healthdata/', views.healthdata, name='healthdata'),
     path('healthdata1/', views.healthdata1, name='healthdata1'),
     path('healthdata2/', views.healthdata2, name='healthdata2'),

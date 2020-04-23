@@ -21,8 +21,25 @@
                 <p class="card-text">
                   Ratings - {{recipe.avgRating}} ({{recipe.totalRatings}})
                 </p>
-                <ul class="list-unstyled list-inline rating mb-0" id="stars">
-                </ul>
+                <div class='rating-stars text-center'>
+                  <ul id='stars'>
+                    <li class='star' title='Poor' data-value='1'>
+                      <i class='fa fa-star fa-fw'></i>
+                    </li>
+                    <li class='star' title='Fair' data-value='2'>
+                      <i class='fa fa-star fa-fw'></i>
+                    </li>
+                    <li class='star' title='Good' data-value='3'>
+                      <i class='fa fa-star fa-fw'></i>
+                    </li>
+                    <li class='star' title='Excellent' data-value='4'>
+                      <i class='fa fa-star fa-fw'></i>
+                    </li>
+                    <li class='star' title='WOW!!!' data-value='5'>
+                      <i class='fa fa-star fa-fw'></i>
+                    </li>
+                  </ul>
+                </div>
              </div>
               <div class="col-2">
               </div>
@@ -60,6 +77,7 @@
     </div>
 
     <script>
+
       $(document).ready(function(){
 
         $.ajax({
@@ -87,18 +105,68 @@
             console.log(data)
           }
         })
-      });
-
-      $(document).ready(function(){
-        if ({{recipe.avgRating}} <=0){
-          for(let i=0;i < 5; i++){
-            $("#stars").append('<li class="list-inline-item mr-0"><i class="fas fa-star "></i></li>')
-          }
-        }else{
-        for(let i=0;i < 5; i++){
-          $("#stars").append('<li class="list-inline-item mr-0"><i class="fas fa-star amber-text"></i></li>')
-        }}
       })
 
+      $(document).ready(function(){
+
+        /* 1. Hovering stars */
+        $('#stars li').on('mouseover', function(){
+          var onStar = parseInt($(this).data('value'), 10); // The star currently mouse on
+
+          // Now highlight all the stars that's not after the current hovered star
+          $(this).parent().children('li.star').each(function(e){
+            if (e < onStar) {
+              $(this).addClass('hover');
+            }
+            else {
+              $(this).removeClass('hover');
+            }
+          });
+
+        }).on('mouseout', function(){
+          $(this).parent().children('li.star').each(function(e){
+            $(this).removeClass('hover');
+          });
+        });
+
+
+        /* 2.When you click a star */
+        $('#stars li').on('click', function(){
+          var onStar = parseInt($(this).data('value'), 10); // The star currently selected
+          var stars = $(this).parent().children('li.star');
+
+          for (i = 0; i < stars.length; i++) {
+            $(stars[i]).removeClass('selected');
+          }
+
+          for (i = 0; i < onStar; i++) {
+            $(stars[i]).addClass('selected');
+          }
+
+          var ValRated = parseInt($('#stars li.selected').last().data('value'), 10);
+
+            $.ajax({
+              url : "{% url 'rating' recipe.id %}",
+              method : "POST",
+              data : {
+                      "recipeID" : {{recipe.id}},
+                      "rating": ValRated,
+                      "csrfmiddlewaretoken" : "{{csrf_token}}"
+                     },
+              success : function (data){
+                console.log(data)
+              }
+            })
+
+          if (ValRated > 1) {
+              console.log("Thanks! You rated this " + ValRated + " stars.")
+          }
+          else {
+              console.log("We will improve ourselves. You rated this " + ValRated + " stars.")
+          }
+        });
+
+
+      });
     </script>
 {% endblock content %}
