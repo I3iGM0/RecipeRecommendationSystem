@@ -252,7 +252,11 @@ def getRecipe(request, pk):
         except Favourites.DoesNotExist:
             fav = False
 
-        ratedRecipe = Rated.objects.get(user = request.user, recipeID = recipe)
+        try:
+            #Check to see if the record exists by date to prevent duplicates
+            ratedRecipe = Rated.objects.get(user = request.user, recipeID = recipe)
+        except Rated.DoesNotExist:
+            ratedRecipe = "None"
         print(ratedRecipe)
         return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,'favourite':fav, 'rated':(ratedRecipe)})
     else:
