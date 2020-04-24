@@ -73,48 +73,70 @@ def home(request):
     if not request.user.is_authenticated:
         return render(request,'HealthyLiving/home.html')
 
-    fav = Favourites.objects.filter(user = request.user).latest('id')
-    print(fav)
-    print('fav' + str(Favourites.objects.filter(user = request.user, course = 'Other').latest('id')))
+    favlist = []
+    recentlist = []
+
+    try:
+        #Check to see if the record exists by date to prevent duplicates
+        fav = Favourites.objects.filter(user = request.user).latest('id')
+        #Get recommendation based of user's recently favourite recipe
+        favLs = []
+        favRecommend = recommend(fav.recipeID.Title)
+        for i in range(len(favRecommend)):
+            #print(favRecommend[i][0])
+            favLs.append(Recipe.objects.get(Title = favRecommend[i][0]))
+
+        favlist = list(favLs)
+        print(favlist)
+    except Favourites.DoesNotExist:
+        print("None for favourites")
+
     try:
         #Check to see if the record exists by date to prevent duplicates
         recent = RecentlyViewed.objects.filter(user = request.user).latest('id')
         ls = recommend(recent.recipeID.Title)
         foodLs = []
-        favLs = []
         foodContext = {}
         #Get recommendation based of user's browsing history
         for i in range(len(ls)):
-            print(ls[i][0])
+            #print(ls[i][0])
             foodLs.append(Recipe.objects.get(Title = ls[i][0]))
 
-        #Get recommendation based of user's recently favourite recipe
-        favRecommend = recommend(fav.recipeID.Title)
-        for i in range(len(favRecommend)):
-            print(favRecommend[i][0])
-            favLs.append(Recipe.objects.get(Title = favRecommend[i][0]))
-
-        foodContext = {
-            'Course' : recent.recipeID.course,
-            'Recipe' : list(foodLs),
-            'Favourite' : list(favLs)
-        }
-
-        return render(request,'HealthyLiving/home.html',foodContext)
-
+        recentlist = list(foodLs)
+        print(recentlist)
     except RecentlyViewed.DoesNotExist:
-        foodContext = {
-            'Recipe' : 'None'
-        }
+        print("None for recentlist")
 
-        return render(request,'HealthyLiving/home.html',foodContext)
+    userRatings = Rated.objects.filter(user = request.user)
+    userfav = Favourites.objects.filter(user = request.user)
+
+    Context = {
+        'Recent' : favlist,
+        'Favourite' : recentlist,
+        'Rated' : list(userRatings),
+        'Favorites' : list(userfav),
+    }
+    return render(request,'HealthyLiving/home.html',Context)
+
 
 def search(request):
     recipe_filter = searchFilter(request.GET, queryset=Recipe.objects.all())
     return render(request,'HealthyLiving/search.html', {'filter':recipe_filter,})
 
 def test(request):
-    return render(request,'HealthyLiving/test.html')
+    userRatings = Rated.objects.filter(user = request.user)
+    if userRatings.count() == 0:
+        ratingExist = "No rated items"
+    else:
+        ratingExist = list(userRatings)
+    print(userRatings.count())
+    userfav = Favourites.objects.filter(user = request.user)
+    print(userfav)
+    context = {
+        'Rated' : list(userRatings),
+        'Favorites' : list(userfav),
+    }
+    return render(request,'HealthyLiving/test.html', context)
 
 def searchView1(request):
     return JsonResponse({
@@ -229,7 +251,10 @@ def getRecipe(request, pk):
             fav = True
         except Favourites.DoesNotExist:
             fav = False
-        return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,'favourite':fav})
+
+        ratedRecipe = Rated.objects.get(user = request.user, recipeID = recipe)
+        print(ratedRecipe)
+        return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,'favourite':fav, 'rated':(ratedRecipe)})
     else:
         return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,})
 

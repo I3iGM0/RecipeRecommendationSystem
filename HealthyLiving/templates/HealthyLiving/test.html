@@ -1,70 +1,59 @@
 {% extends "HealthyLiving/base.html" %}
 
 {% block content %}
-<div class="container">
-  <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-  <ol class="carousel-indicators">
-    <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
-    <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
-    <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
-  </ol>
-  <div class="carousel-inner">
-    <div class="carousel-item">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">hi</h5>
+
+  <div class="container">
+    <div class="container">
+      <h3>Rated Recipes</h3>
+      <div class="ui four cards">
+        {% for recipe in Rated %}
+          <div class="card">
+            <div class="image">
+              <img src = "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg">
+            </div>
+            <div class="content">
+              <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+            </div>
+            <div class="extra">
+              Rating:
+              <div class="ui star rating" data-rating= "{{recipe.rating}}"></div>
+            </div>
+          </div>
+        {% endfor %}
         </div>
-        <div class="card-body">
-          <h5 class="card-title">hi</h5>
-          <p class="card-text"><small class="text-muted">hi</small></p>
-          <a class="btn btn-primary">View Recipe</a>
-        </div>
-      </div>
-      <div class="carousel-caption d-none d-md-block">
-      </div>
     </div>
-    <div class="carousel-item">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">hi</h5>
+    <br>
+    <div class="container">
+      <h3>Favourited Recipes</h3>
+      <div class="ui four cards">
+        {% for recipe in Favorites %}
+          <div class="card">
+            <div class="image">
+              <img src = "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg">
+            </div>
+            <div class="content">
+              <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+            </div>
+            <div class="extra">
+              Rating:
+              <div class="ui star rating" data-rating= "{{recipe.rating}}"></div>
+            </div>
+          </div>
+        {% endfor %}
         </div>
-        <div class="card-body">
-          <h5 class="card-title">hi</h5>
-          <p class="card-text"><small class="text-muted">hi</small></p>
-          <a class="btn btn-primary">View Recipe</a>
-        </div>
-      </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Second slide label</h5>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">hi</h5>
-        </div>
-        <div class="card-body">
-          <h5 class="card-title">hi</h5>
-          <p class="card-text"><small class="text-muted">hi</small></p>
-          <a class="btn btn-primary">View Recipe</a>
-        </div>
-      </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Third slide label</h5>
-        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-      </div>
     </div>
   </div>
-  <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
-</div>
-</div>
 
+    <script>
+      $(document).ready(function(){
+          // All your normal JS code goes in here
+          $(".rating").rating({
+            maxRating: 5,
+            onRate: function(value) {
+                console.log('value set to:' + value);
+              },
+          })
+          $('.rating').rating('disable')
+          });
+    </script>
 {% endblock content %}

@@ -31,15 +31,15 @@
               </div>
             </div>
 
-            {% for recipe in Recipe %}
-              <div class="carousel-item">
+            {% for recipe in Recent %}
+              <div class="carousel-item ">
                 <div class="card text-center">
                   <div class="card-header">
                   </div>
                   <div class="card-body">
                     <h5 class="card-title">{{recipe.Title}}</h5>
                     <p class="card-text"></p>
-                    <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
+                    <a href="" class="btn btn-primary">View Recipe</a>
                   </div>
                   <div class="card-footer text-muted">
                   </div>
@@ -115,7 +115,46 @@
             <span class="sr-only">Next</span>
           </a>
         </div>
-
+        <br>
+        <div class="container">
+          <div class="container">
+            <h3>Rated Recipes</h3>
+            <div class="ui four cards">
+              {% for recipe in Rated %}
+                <div class="card">
+                  <div class="image">
+                    <img class="recipeimg" src = "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg">
+                  </div>
+                  <div class="content">
+                    <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+                  </div>
+                  <div class="extra">
+                    Rating:
+                    <div class="ui star rating" data-rating= "{{recipe.rating}}"></div>
+                  </div>
+                </div>
+              {% endfor %}
+              </div>
+          </div>
+          <br>
+          <div class="container">
+            <h3>Favourited Recipes</h3>
+            <div class="ui four cards">
+              {% for recipe in Favorites %}
+                <div class="card">
+                  <div class="image">
+                    <img class="recipeimg" src = "https://miro.medium.com/max/1200/1*mk1-6aYaf_Bes1E3Imhc0A.jpeg">
+                  </div>
+                  <div class="content">
+                    <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+                  </div>
+                  <div class="extra">
+                  </div>
+                </div>
+              {% endfor %}
+              </div>
+          </div>
+        </div>
       </div>
     {% else %}
       <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
@@ -125,5 +164,29 @@
       </div>
     {% endif %}
 
+    <script>
+      $(document).ready(function(){
+          // All your normal JS code goes in here
+          $(".rating").rating({
+            maxRating: 5,
+            onRate: function(value) {
+                console.log('value set to:' + value);
+              },
+          })
+          $('.rating').rating('disable')
+          });
+
+        var url = encodeURI("Carrot, Fennel, and Orange Soup")
+        $(document).ready(function(){
+          $.ajax({
+            url : "https://www.googleapis.com/customsearch/v1?q="+url+"&cx=009921154466946369670%3Aoldelsixjh6&searchType=image&key=AIzaSyDwEsud6sJVwfrsrPme_BXRlgEf9VHNtEw",
+            method : "GET",
+            success : function (data){
+              console.log(data['items']['0']['link'])
+              $('.recipeimg').attr('src',data['items']['0']['link']);
+            }
+          })
+        })
+    </script>
 
 {% endblock content %}
