@@ -107,8 +107,8 @@ def home(request):
     except RecentlyViewed.DoesNotExist:
         print("None for recentlist")
 
-    userRatings = Rated.objects.filter(user = request.user)
-    userfav = Favourites.objects.filter(user = request.user)
+    userRatings = Rated.objects.filter(user = request.user)[:5]
+    userfav = Favourites.objects.filter(user = request.user)[:5]
 
     Context = {
         'Recent' : favlist,
@@ -124,13 +124,13 @@ def search(request):
     return render(request,'HealthyLiving/search.html', {'filter':recipe_filter,})
 
 def test(request):
-    userRatings = Rated.objects.filter(user = request.user)
+    userRatings = Rated.objects.filter(user = request.user)[:4]
     if userRatings.count() == 0:
         ratingExist = "No rated items"
     else:
         ratingExist = list(userRatings)
     print(userRatings.count())
-    userfav = Favourites.objects.filter(user = request.user)
+    userfav = Favourites.objects.filter(user = request.user)[:4]
     print(userfav)
     context = {
         'Rated' : list(userRatings),

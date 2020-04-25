@@ -42,6 +42,21 @@
         {% endfor %}
         </div>
     </div>
+    
+    <div class="card-columns">
+      {% for recipe in Favorites %}
+      <div class="card">
+        <img src = "https://i2.wp.com/gutsybynature.com/wp/wp-content/uploads/2019/01/carrot-fennel-soup.jpg?fit=1200%2C798&ssl=1" height="100%" width="100%">
+        <div class="card-body">
+          <h5 class="card-title">{{recipe.recipeID}}</h5>
+          <p class="card-text"><small class="text-muted">{{recipe.date}}</small></p>
+        </div>
+        <div class="card-footer">
+          <div class="ui star rating" data-rating= "3"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
 
     <script>

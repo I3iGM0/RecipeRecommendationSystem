@@ -30,72 +30,90 @@
           crossorigin="anonymous"type="text/javascript"></script>
 </head>
 <body>
-  <div class="container">
-    <header class="site-header container">
-      <nav class="navbar navbar-expand-md navbar-light box-shadow shadow fixed-top " style="background-image: linear-gradient(to top, #fff 0%, #fff 100%);">
-        <div class="container-fluid">
-          <a class="navbar-brand mr-4" href="{% url 'healthyliving-home' %}">Healthy Living</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="navbar-nav mr-auto">
-              <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-home' %}">Home</a>
-              <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-recipes' %}">Recipes</a>
-            </div>
-            <!-- Navbar Right Side -->
 
-            <div class="navbar-nav">
-              {% if user.is_authenticated %}
-              <li>
-                <a class="nav-item nav-link p-2 text-dark" href="{% url 'healthdata' %}">Health Data</a>
-              </li>
 
-              <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="mr-2 d-none d-lg-inline text-dark ">{{ user.username }}</span>
-                  <img class="img-profile rounded-circle" src="">
+  <!--Main Navigation-->
+  <header>
+    <nav class="navbar navbar-expand-md navbar-light box-shadow shadow fixed-top bg-white">
+      <div class="container-fluid">
+        <a class="navbar-brand mr-4" href="{% url 'healthyliving-home' %}">Healthy Living</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav mr-auto">
+            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-home' %}">Home</a>
+            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-recipes' %}">Recipes</a>
+          </div>
+          <!-- Navbar Right Side -->
+
+          <div class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li>
+              <a class="nav-item nav-link p-2 text-dark" href="{% url 'healthdata' %}">Health Data</a>
+            </li>
+
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-dark ">{{ user.username }}</span>
+                <img class="img-profile rounded-circle" src="">
+              </a>
+              <!-- Dropdown - User Information -->
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="{% url 'profile' %}">
+                  <i class="fa fa-cogs fa-sm fa-fw mr-2"></i>
+                  Settings
                 </a>
-                <!-- Dropdown - User Information -->
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                  <a class="dropdown-item" href="{% url 'profile' %}">
-                    <i class="fa fa-cogs fa-sm fa-fw mr-2"></i>
-                    Settings
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{% url 'logout' %}">
-                    <i class="fa fa-sign-out"></i>
-                    Logout
-                  </a>
-                </div>
-              </li>
-              {% else %}
-              <a class="nav-item  nav-link p-2 text-dark" href="{% url 'login' %}">Login</a>
-              <a class="nav-item  nav-link p-2 text-dark" href="{% url 'register' %}">Register</a>
-              {% endif %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout' %}">
+                  <i class="fa fa-sign-out"></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+            {% else %}
+            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'login' %}">Login</a>
+            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'register' %}">Register</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="view intro-2">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-strong flex-center">
+          <div class="container">
+            <div class="white-text text-center wow fadeInUp">
+              <h2>This Navbar isn't fixed</h2>
+              <h5>When you scroll down it will disappear</h5>
+              <br>
+              <p>Full page intro with background image will be always displayed in full screen mode, regardless
+                of device </p>
             </div>
           </div>
         </div>
-      </nav>
-    </header>
-    <main role="main" class="container">
-        {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-          </div>
-          {% endfor %}
-        {% endif %}
+      </div>
+    </div>
 
-        {% block content %}
-        {% endblock %}
-    </main>
-  </div>
+  </header>
+  <main role="main" >
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      {% endif %}
 
+      {% block content %}
+      {% endblock %}
+  </main>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.14.1/js/mdb.min.js"></script>
 </body>
+</script>
 </html>
