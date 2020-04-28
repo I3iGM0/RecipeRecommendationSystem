@@ -75,7 +75,8 @@ def home(request):
 
     favlist = []
     recentlist = []
-
+    messageFav = ""
+    messageRecent = ""
     try:
         #Check to see if the record exists by date to prevent duplicates
         fav = Favourites.objects.filter(user = request.user).latest('id')
@@ -89,6 +90,7 @@ def home(request):
         favlist = list(favLs)
         print(favlist)
     except Favourites.DoesNotExist:
+        messageFav = "None for favourites"
         print("None for favourites")
 
     try:
@@ -105,6 +107,7 @@ def home(request):
         recentlist = list(foodLs)
         print(recentlist)
     except RecentlyViewed.DoesNotExist:
+        messageRecent = "None for recentlist"
         print("None for recentlist")
 
     userRatings = Rated.objects.filter(user = request.user)[:5]
@@ -115,9 +118,10 @@ def home(request):
         'Favourite' : recentlist,
         'Rated' : list(userRatings),
         'Favorites' : list(userfav),
+        'messagefav': messageFav,
+        'messagerecent':messageRecent,
     }
     return render(request,'HealthyLiving/home.html',Context)
-
 
 def search(request):
     recipe_filter = searchFilter(request.GET, queryset=Recipe.objects.all())
@@ -220,12 +224,13 @@ def rating(request , pk):
     recipe = Recipe.objects.get(pk = request.POST['recipeID'])
     rating = request.POST['rating']
     recipeName = recipe.Title
-    print(Rated.objects.all().order_by('-rating'))
-    reciperecord = Recipe.objects.get(pk=request.POST['recipeID'])
-    reciperecord.avgRating = rating  # change field
-    reciperecord.save() # this will update only
+    #print(Rated.objects.all().order_by('-rating'))
+
     try:
         #Check to see if the record exists by date to prevent duplicates
+        reciperecord = Recipe.objects.get(pk=request.POST['recipeID'])
+        reciperecord.avgRating = rating  # change field
+        reciperecord.save() # this will update only
         Rated.objects.get(recipeID = recipe ,user=request.user)
         return JsonResponse({
             'recieved' : 'Yes but record already exists',

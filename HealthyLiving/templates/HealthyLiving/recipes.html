@@ -43,14 +43,15 @@
           <div class="row">
             {% for recipe in Recipe %}
             <div class="col-md-4">
-              <div class="card mb-4 shadow-sm">
+              <div class="card border-light mb-3" style="max-width: 18rem;">
+                <div class="card-header bg-transparent">{{recipe.Title}}</div>
                 <div class="card-body">
-                  <p class="card-text">{{recipe.Title}}</p>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div class="btn-group">
-                      <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
-                    </div>
-                  </div>
+                  <h5 class="card-title">{{recipe.categories}}</h5>
+                  <p class="card-text">View Recipe!</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                  <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
+                  <div class="ui star rating" data-rating= "{{recipe.avgRating}}"></div>
                 </div>
               </div>
             </div>

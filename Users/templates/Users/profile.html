@@ -4,7 +4,7 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-xl-8 col-lg-7 card border-0 shadow ">
+    <div class="col-xl-12 col-lg-7 card border-0 shadow ">
       <br>
         <h2 class="ui header">
           <i class="settings icon"></i>
@@ -24,19 +24,6 @@
           </div>
       </form>
     </div>
-
-    <div class="col-xl-4 col-md-auto">
-      <div class="ui card">
-        <a class="image" href="#">
-          <img src="{{ user.profile.image.url }}">
-        </a>
-        <div class="content">
-          <a class="header">{{ user.username }}</a>
-          <div class="meta">
-            <a>{{ user.email }}</a>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
 </div>
 {% endblock content %}

@@ -27,16 +27,17 @@
   <div class="card-columns" display: inline-block>
 
     {% for recipe in filter.qs %}
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">{{recipe.Title}}</h5>
-        </div>
-        <div class="card-body">
-          <h5 class="card-title">{{recipe.categories}}</h5>
-          <p class="card-text"><small class="text-muted">{{recipe.avgRating}}</small></p>
-          <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
-        </div>
+    <div class="card border-light mb-3" style="max-width: 18rem;">
+      <div class="card-header bg-transparent">{{recipe.Title}}</div>
+      <div class="card-body">
+        <h5 class="card-title">{{recipe.categories}}</h5>
+        <p class="card-text"><a href="{% url 'getRecipe' recipe.recipeID.id%}"> View Recipe!</a></p>
       </div>
+      <div class="card-footer bg-transparent">
+        <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
+        <div class="ui star rating" data-rating= "{{recipe.avgRating}}"></div>
+      </div>
+    </div>
     {% endfor %}
 
   </div>
