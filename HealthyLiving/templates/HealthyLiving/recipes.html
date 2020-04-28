@@ -47,7 +47,6 @@
                 <div class="card-header bg-transparent">{{recipe.Title}}</div>
                 <div class="card-body">
                   <h5 class="card-title">{{recipe.categories}}</h5>
-                  <p class="card-text">View Recipe!</p>
                 </div>
                 <div class="card-footer bg-transparent">
                   <a href="{% url 'getRecipe' recipe.id%}" class="btn btn-primary">View Recipe</a>
@@ -104,6 +103,17 @@ $(document).on('scroll', function() {
     $('.scroll-to-top').fadeOut();
   }
 });
+
+$(document).ready(function(){
+    // All your normal JS code goes in here
+    $(".rating").rating({
+      maxRating: 5,
+      onRate: function(value) {
+          console.log('value set to:' + value);
+        },
+    })
+    $('.rating').rating('disable')
+    });
 </script>
 
 

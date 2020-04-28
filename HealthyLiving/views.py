@@ -95,7 +95,7 @@ def home(request):
 
     try:
         #Check to see if the record exists by date to prevent duplicates
-        recent = RecentlyViewed.objects.filter(user = request.user).latest('id')
+        recent = RecentlyViewed.objects.filter(user = request.user).latest('Date')
         ls = recommend(recent.recipeID.Title)
         foodLs = []
         foodContext = {}
@@ -187,7 +187,10 @@ def recentlyVisited(request , pk):
     user = request.user
     try:
         #Check to see if the record exists by date to prevent duplicates
-        RecentlyViewed.objects.get(recipeID = recipe ,user=request.user)
+        recent = RecentlyViewed.objects.get(recipeID = recipe ,user=request.user)
+        recent.Date = datetime.now()
+        recent.save()
+        print(recent)
         return JsonResponse({
             'recieved' : 'exists'
         })

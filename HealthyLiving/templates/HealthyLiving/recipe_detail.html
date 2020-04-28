@@ -3,73 +3,91 @@
 {% block content %}
 
     <div class="container">
-      <div class="card booking-card">
-        <div class="view overlay">
-          <img class="card-img-top" alt="Card image cap">
-          <a href="#!">
-            <div class="mask rgba-white-slight"></div>
-          </a>
-        </div>
-
-        <div class="card-body">
-          <h1 class="card-title font-weight-bold"><a>{{recipe.Title}}</a></h1>
-          <div class="container">
-            <div class="row">
-              <div class="col-6">
-                <p class="card-text">
-                  Ratings - {{recipe.avgRating}} ({{recipe.totalRatings}})
-                </p>
-                <div class='rating-stars text-center'>
-                  <ul id='stars'>
-                    <li class='star' title='Poor' data-value='1'>
-                      <i class='fa fa-star fa-fw'></i>
-                    </li>
-                    <li class='star' title='Fair' data-value='2'>
-                      <i class='fa fa-star fa-fw'></i>
-                    </li>
-                    <li class='star' title='Good' data-value='3'>
-                      <i class='fa fa-star fa-fw'></i>
-                    </li>
-                    <li class='star' title='Excellent' data-value='4'>
-                      <i class='fa fa-star fa-fw'></i>
-                    </li>
-                    <li class='star' title='WOW!!!' data-value='5'>
-                      <i class='fa fa-star fa-fw'></i>
-                    </li>
-                  </ul>
-                </div>
-             </div>
-              <div class="col-2">
-              </div>
-              <div class="col-4">
-                {% if user.is_authenticated %}
-                <nav>
-                  <ul style="list-style: none; margin: 0; padding: 0;">
-                    {% if favourite %}
-                      <li><i class="fas fa-heart fa-5x" style="color:red"></i></li>
-                    {% else %}
-                      <li><i class="fas fa-heart fa-5x" style="color:black"></i></li>
-                    {% endif %}
-                  </ul>
-                </nav>
-                {% else %}
-                  <p>
-                    Login to Favourite!!!
+      <div class="row">
+        <div class="card booking-card">
+          <div class="card-body">
+            <h1 class="card-title font-weight-bold"><a>{{recipe.Title}}</a></h1>
+            <div class="container">
+              <div class="row">
+                <div class="col-6">
+                  <p class="card-text">
+                    Ratings - {{recipe.avgRating}} ({{recipe.totalRatings}})
                   </p>
-                {% endif %}
+                  <div class='rating-stars text-center'>
+                    <ul id='stars'>
+                      <li class='star' title='Poor' data-value='1'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Fair' data-value='2'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Good' data-value='3'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='Excellent' data-value='4'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                      <li class='star' title='WOW!!!' data-value='5'>
+                        <i class='fa fa-star fa-fw'></i>
+                      </li>
+                    </ul>
+                  </div>
+               </div>
+                <div class="col-2">
+                </div>
+                <div class="col-4">
+                  {% if user.is_authenticated %}
+                  <nav>
+                    <ul style="list-style: none; margin: 0; padding: 0;">
+                      {% if favourite %}
+                        <li><i class="fas fa-heart fa-5x" style="color:red"></i></li>
+                      {% else %}
+                        <li><i class="fas fa-heart fa-5x" style="color:black"></i></li>
+                      {% endif %}
+                    </ul>
+                  </nav>
+                  {% else %}
+                    <p>
+                      Login to Favourite!!!
+                    </p>
+                  {% endif %}
+                </div>
               </div>
             </div>
+
+            <h3 class="card-title font-weight-bold"><a>Ingredients</a></h3>
+            <hr class="my-4">
+            <p class="card-text">{{recipe.ingredients}}</p>
+            <h3 class="card-title font-weight-bold"><a>Directions</a></h3>
+            <hr class="my-4">
+            <p class="card-text">{{recipe.directions}}</p>
+            <hr class="my-4">
+            <p class="card-text"> Categories - [{{recipe.categories}}]</p>
+
           </div>
-
-          <h3 class="card-title font-weight-bold"><a>Ingredients</a></h3>
-          <hr class="my-4">
-          <p class="card-text">{{recipe.ingredients}}</p>
-          <h3 class="card-title font-weight-bold"><a>Directions</a></h3>
-          <hr class="my-4">
-          <p class="card-text">{{recipe.directions}}</p>
-          <hr class="my-4">
-          <p class="card-text"> Categories - [{{recipe.categories}}]</p>
-
+        </div>
+      </div>
+      <hr class="my-5">
+      <div class="row">
+        <div class="card-deck">
+          <div class="card" style="width: 18rem;">
+            <img class="card-img-top card-img-top1" alt="..." height="250px" width="250px">
+            <div class="card-body">
+              <p class="card-text">Image 1</p>
+            </div>
+          </div>
+          <div class="card" style="width: 18rem;">
+            <img class="card-img-top card-img-top2" alt="..." height="250px" width="250px">
+            <div class="card-body">
+              <p class="card-text">Image 2</p>
+            </div>
+          </div>
+          <div class="card" style="width: 18rem;">
+            <img class="card-img-top card-img-top3" alt="..." height="250px" width="250px">
+            <div class="card-body">
+              <p class="card-text">Image 3</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -82,9 +100,13 @@
             url : "https://www.googleapis.com/customsearch/v1?q="+url+"&cx=009921154466946369670%3Aoldelsixjh6&searchType=image&key=AIzaSyDwEsud6sJVwfrsrPme_BXRlgEf9VHNtEw",
             method : "GET",
             success : function (data){
+              console.log(data)
               console.log(data['items']['0']['link'])
               console.log(url)
-              $('.card-img-top').attr('src',data['items']['0']['link']);
+              $('.card-img-top1').attr('src',data['items']['0']['link']);
+              $('.card-img-top2').attr('src',data['items']['1']['link']);
+              $('.card-img-top3').attr('src',data['items']['2']['link']);
+
             }
           })
         })
@@ -177,5 +199,7 @@
             }
           });
         });
+
+
     </script>
 {% endblock content %}
