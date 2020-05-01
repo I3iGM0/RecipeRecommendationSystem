@@ -60,7 +60,11 @@
             <p class="card-text">{{recipe.ingredients}}</p>
             <h3 class="card-title font-weight-bold"><a>Directions</a></h3>
             <hr class="my-4">
-            <p class="card-text">{{recipe.directions}}</p>
+            <ul>
+              {% for x in ingredients %}
+              <li class="card-text" >{{x}}</li>
+              {% endfor %}
+            </ul>
             <hr class="my-4">
             <p class="card-text"> Categories - [{{recipe.categories}}]</p>
 

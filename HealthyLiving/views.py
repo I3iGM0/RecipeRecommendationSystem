@@ -5,6 +5,9 @@ from django.views.generic import ListView, DetailView
 from django.utils.timezone import now
 from django.utils.timezone import datetime
 from django.core.paginator import Paginator
+from django.core import mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import os
 import time
 from HealthyLivingApp.settings import RECOMMEND_DIR
@@ -140,6 +143,14 @@ def test(request):
         'Rated' : list(userRatings),
         'Favorites' : list(userfav),
     }
+
+    subject = 'Subject'
+    html_message = render_to_string('HealthyLiving/email-update.html', context)
+    plain_message = strip_tags(html_message)
+    from_email =  'mohamedtestemail98@gmail.com'
+    to = request.user.email
+
+    mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message)
     return render(request,'HealthyLiving/test.html', context)
 
 def searchView1(request):
@@ -250,7 +261,6 @@ def rating(request , pk):
 def getRecipe(request, pk):
     user = request.user
     recipe = Recipe.objects.get(pk = pk)
-
     if request.user.is_authenticated:
         fav = False
         try:
@@ -266,7 +276,9 @@ def getRecipe(request, pk):
         except Rated.DoesNotExist:
             ratedRecipe = "None"
         print(ratedRecipe)
-        return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,'favourite':fav, 'rated':(ratedRecipe)})
+        return render(request,'HealthyLiving/recipe_detail.html',
+        {'recipe' : recipe,'favourite':fav, 'rated':(ratedRecipe),
+         "ingredients": (recipe.directions.split('.,'))})
     else:
         return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,})
 

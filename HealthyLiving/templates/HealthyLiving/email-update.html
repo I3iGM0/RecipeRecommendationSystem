@@ -89,8 +89,25 @@
         {% endfor %}
       {% endif %}
       <div class="container">
-        {% block content %}
-        {% endblock %}
+          <div class="container">
+            <div class="container">
+              <h3>Rated Recipes</h3>
+                {% for recipe in Rated %}
+                <p>
+                  <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+                </p>
+                {% endfor %}
+                </div>
+            <br>
+            <div class="container">
+              <h3>Favourited Recipes</h3>
+                {% for recipe in Favorites %}
+                  <p>
+                     <a class="" href="{% url 'getRecipe' recipe.recipeID.id%}">{{recipe.recipeID}}</a>
+                </p>
+                {% endfor %}
+                </div>
+              </div>
       </div>
   </main>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
