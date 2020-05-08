@@ -25,11 +25,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
 
-
 df = pd.read_csv(url,sep = ',')
-df.categories.fillna(' ', inplace=True)
-df.isna().sum()
-#df.info()
 df.set_index('title', inplace = True)
 
 custom  = pd.read_csv(url ,sep = ',')
@@ -73,13 +69,15 @@ def recommend(food):
     return foodarray[1:5]
 
 def home(request):
-    if not request.user.is_authenticated:
-        return render(request,'HealthyLiving/home.html')
 
     favlist = []
     recentlist = []
     messageFav = ""
     messageRecent = ""
+
+    if not request.user.is_authenticated:
+        return render(request,'HealthyLiving/home.html')
+
     try:
         #Check to see if the record exists by date to prevent duplicates
         fav = Favourites.objects.filter(user = request.user).latest('id')
@@ -98,13 +96,13 @@ def home(request):
 
     try:
         #Check to see if the record exists by date to prevent duplicates
-        recent = RecentlyViewed.objects.filter(user = request.user).latest('Date')
+        recent = RecentlyViewed.objects.filter(user = request.user).latest('id')
         ls = recommend(recent.recipeID.Title)
         foodLs = []
         foodContext = {}
         #Get recommendation based of user's browsing history
         for i in range(len(ls)):
-            #print(ls[i][0])
+            print(ls[i][0])
             foodLs.append(Recipe.objects.get(Title = ls[i][0]))
 
         recentlist = list(foodLs)
@@ -117,8 +115,8 @@ def home(request):
     userfav = Favourites.objects.filter(user = request.user)[:5]
 
     Context = {
-        'Recent' : favlist,
-        'Favourite' : recentlist,
+        'Recent' : recentlist,
+        'Favourite' :favlist,
         'Rated' : list(userRatings),
         'Favorites' : list(userfav),
         'messagefav': messageFav,
@@ -276,9 +274,16 @@ def getRecipe(request, pk):
         except Rated.DoesNotExist:
             ratedRecipe = "None"
         print(ratedRecipe)
+        print(recipe.ingredients.split(', '))
         return render(request,'HealthyLiving/recipe_detail.html',
-        {'recipe' : recipe,'favourite':fav, 'rated':(ratedRecipe),
-         "ingredients": (recipe.directions.split('.,'))})
+        {
+            'recipe': recipe,
+            'favourite':fav,
+            'rated':(ratedRecipe),
+            'directions': (recipe.directions.split('.')),
+            'categories': (recipe.categories.split(',')),
+            'ingredients':(recipe.ingredients.split(',')),
+        })
     else:
         return render(request,'HealthyLiving/recipe_detail.html',{'recipe' : recipe,})
 

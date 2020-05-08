@@ -22,7 +22,7 @@
     {% if title %}
         <title>Healthy Living - {{ title }}</title>
     {% else %}
-        <title>Healthy Living</title>
+        <title>Recipe Recommender</title>
     {% endif %}
     <script
           src="https://code.jquery.com/jquery-3.4.1.js"
@@ -30,23 +30,20 @@
           crossorigin="anonymous"type="text/javascript"></script>
 </head>
 <body>
-
-
-  <!--Main Navigation-->
+  <!--Header Navigation-->
   <header>
     <nav class="navbar navbar-expand-md navbar-light box-shadow shadow fixed-top bg-white">
       <div class="container-fluid">
-        <a class="navbar-brand mr-4" href="{% url 'healthyliving-home' %}">Healthy Living</a>
+        <a class="navbar-brand mr-4" href="{% url 'healthyliving-home' %}">Recipe Recommender</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <div class="navbar-nav mr-auto">
             <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-home' %}">Home</a>
-            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-recipes' %}">Recipes</a>
+            <a class="nav-item  nav-link p-2 text-dark" href="{% url 'healthyliving-recipes' %}">Browse Recipes</a>
           </div>
           <!-- Navbar Right Side -->
-
           <div class="navbar-nav">
             {% if user.is_authenticated %}
             <li>
@@ -80,6 +77,7 @@
       </div>
     </nav>
   </header>
+  <!--Main Navigation-->
   <main role="main" >
       {% if messages %}
         {% for message in messages %}
