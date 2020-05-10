@@ -12,7 +12,6 @@ import os
 import time
 from HealthyLivingApp.settings import RECOMMEND_DIR
 url = os.path.join(RECOMMEND_DIR, 'MasterRecipeFile.csv')
-
 #Import models
 from Users.models import Profile,HealthData
 from .models import *
@@ -70,25 +69,37 @@ def recommend(food):
 
 def home(request):
 
-    favlist = []
-    recentlist = []
-    messageFav = ""
-    messageRecent = ""
-
     if not request.user.is_authenticated:
         return render(request,'HealthyLiving/home.html')
+
+    favlist = []
+    recentlist = []
+    ratedList = []
+
+    recentfav = ""
+    recentRecent = ""
+    recentRated = ""
+    messageFav = ""
+    messageRecent = ""
+    messageRated = ""
+
+    #Breakfast,lunch dinner,other,side dessert
+    Courses = ['Breakfast','Lunch','Dinner','Other','Side','Dessert']
 
     try:
         #Check to see if the record exists by date to prevent duplicates
         fav = Favourites.objects.filter(user = request.user).latest('id')
+        print(fav)
         #Get recommendation based of user's recently favourite recipe
         favLs = []
+        recentfav = fav.recipeID.Title
         favRecommend = recommend(fav.recipeID.Title)
         for i in range(len(favRecommend)):
-            #print(favRecommend[i][0])
+            print(favRecommend[i][0])
             favLs.append(Recipe.objects.get(Title = favRecommend[i][0]))
 
         favlist = list(favLs)
+        print('Favourites')
         print(favlist)
     except Favourites.DoesNotExist:
         messageFav = "None for favourites"
@@ -97,6 +108,7 @@ def home(request):
     try:
         #Check to see if the record exists by date to prevent duplicates
         recent = RecentlyViewed.objects.filter(user = request.user).latest('id')
+        recentRecent = recent.recipeID.Title
         ls = recommend(recent.recipeID.Title)
         foodLs = []
         foodContext = {}
@@ -106,10 +118,30 @@ def home(request):
             foodLs.append(Recipe.objects.get(Title = ls[i][0]))
 
         recentlist = list(foodLs)
+        print('Recent')
         print(recentlist)
     except RecentlyViewed.DoesNotExist:
         messageRecent = "None for recentlist"
         print("None for recentlist")
+
+    try:
+        #Check to see if the record exists by date to prevent duplicates
+        recentlyRated = Rated.objects.filter(user = request.user, rating__in = [3,4,5]).latest('id')
+        ls = recommend(recentlyRated.recipeID.Title)
+        recentRated = recentlyRated
+        foodLs = []
+        foodContext = {}
+        #Get recommendation based of user's browsing history
+        for i in range(len(ls)):
+            #print(ls[i][0])
+            foodLs.append(Recipe.objects.get(Title = ls[i][0]))
+
+        ratedList = list(foodLs)
+        print('recentlyRated' + str(recentlyRated.id))
+        print(ratedList)
+    except Rated.DoesNotExist:
+        messageRecent = "None for recentlist"
+        print("None for recentlyrated")
 
     userRatings = Rated.objects.filter(user = request.user)[:5]
     userfav = Favourites.objects.filter(user = request.user)[:5]
@@ -117,10 +149,12 @@ def home(request):
     Context = {
         'Recent' : recentlist,
         'Favourite' :favlist,
+        'RecentlyRated' :ratedList,
         'Rated' : list(userRatings),
         'Favorites' : list(userfav),
-        'messagefav': messageFav,
-        'messagerecent':messageRecent,
+        'recent_Fav': recentfav,
+        'recent_Recent':recentRecent,
+        'recent_Rated':recentRated,
     }
     return render(request,'HealthyLiving/home.html',Context)
 
@@ -213,7 +247,7 @@ def recentlyVisited(request , pk):
 
 def favourites(request , pk):
     user = request.user
-    recipe = Recipe.objects.get(pk = request.POST['recipeID'])
+    recipe = Recipe.objects.get(pk = pk)
     recipeName = recipe.Title
 
     try:
@@ -259,22 +293,48 @@ def rating(request , pk):
 def getRecipe(request, pk):
     user = request.user
     recipe = Recipe.objects.get(pk = pk)
+    fav = False
+    if 'favourite' in request.POST:
+        print(request.POST.get['favourite'])
+    else:
+        print("none")
+
     if request.user.is_authenticated:
-        fav = False
+        recentlyVisited = Recipe.objects.get(pk = pk)
+        recipeName = recentlyVisited.Title
+        user = request.user
+
+        #CHECKS TO SEE IF RECIPE HAS BEEN RECENTLY VIEWED
+        try:
+            #Check to see if the record exists by date to prevent duplicates
+            recent = RecentlyViewed.objects.get(recipeID = recentlyVisited ,user=request.user)
+            recent.Date = datetime.now()
+            recent.save()
+            print(recent)
+            print('Has been viewed already')
+        except RecentlyViewed.DoesNotExist:
+            #Create a new record if it doesnt exist
+            recent = RecentlyViewed(recipeID = recipe ,user=request.user,Date = datetime.now())
+            recent.save()
+            print('Hasnt been viewed before new log')
+        #CHECKS TO SEE IF RECIPE HAS BEEN favourited
         try:
             #Check to see if the record exists by date to prevent duplicates
             Favourites.objects.get(recipeID = recipe ,user=request.user)
             fav = True
+            print("Has been favourited")
         except Favourites.DoesNotExist:
             fav = False
-
+            print("Has not been favourited")
+        #CHECKS TO SEE IF RECIPE HAS BEEN rated
         try:
             #Check to see if the record exists by date to prevent duplicates
             ratedRecipe = Rated.objects.get(user = request.user, recipeID = recipe)
         except Rated.DoesNotExist:
+            print("Has not been rated")
             ratedRecipe = "None"
-        print(ratedRecipe)
-        print(recipe.ingredients.split(', '))
+
+        #print(recipe.ingredients.split(', '))
         return render(request,'HealthyLiving/recipe_detail.html',
         {
             'recipe': recipe,
@@ -289,6 +349,8 @@ def getRecipe(request, pk):
 
 def recipes(request):
     return render(request,'HealthyLiving/recipes.html',foodContext)
+
+#IGNORE THESE Funtions
 
 def healthdata(request):
     try:
