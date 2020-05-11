@@ -6,10 +6,12 @@ from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm,ProfileForm
 # Create your views here.
 
 
+#Handles the registration od the user by recievieng a POST reuest
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         profileform = ProfileForm(request.POST)
+        #checks if the form entered is valid
         if form.is_valid() and profileform.is_valid():
             user = form.save()
             user.profile.date_of_birth = profileform.cleaned_data.get('dob')
@@ -17,14 +19,16 @@ def register(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f'Your Account created has been created you can now log in { username }!')
             return redirect('login')
+        #if not valid re render and send an error message
     else:
         form = UserRegisterForm()
         profileform = ProfileForm()
     return render(request, 'users/register.html', {'form': form,'profileform': profileform})
 
-
+#Checks to see if user is logged in
 @login_required
 def profile(request):
+    #Updates the profile details
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST,

@@ -17,13 +17,14 @@ from Users.models import Profile,HealthData
 from .models import *
 from Users.models import Profile
 from .filters import searchFilter
-#import python libraries
+#import python sci-kit libraries
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
 
+#Opens and executes the dataset stored locally
 df = pd.read_csv(url,sep = ',')
 df.set_index('title', inplace = True)
 
@@ -68,10 +69,11 @@ def recommend(food):
     return foodarray[1:5]
 
 def home(request):
-
+#checks to see if user is not logged in to the application
     if not request.user.is_authenticated:
         return render(request,'HealthyLiving/home.html')
 
+#Variables used to return a list of recommended recipes
     favlist = []
     recentlist = []
     ratedList = []
@@ -145,7 +147,7 @@ def home(request):
 
     userRatings = Rated.objects.filter(user = request.user)[:5]
     userfav = Favourites.objects.filter(user = request.user)[:5]
-
+#Sends the data of recommended recipes and renders the home page.
     Context = {
         'Recent' : recentlist,
         'Favourite' :favlist,
@@ -158,10 +160,12 @@ def home(request):
     }
     return render(request,'HealthyLiving/home.html',Context)
 
+#No longer needed
 def search(request):
     recipe_filter = searchFilter(request.GET, queryset=Recipe.objects.all())
     return render(request,'HealthyLiving/search.html', {'filter':recipe_filter,})
 
+#No longer needed
 def test(request):
     userRatings = Rated.objects.filter(user = request.user)[:4]
     if userRatings.count() == 0:
@@ -185,18 +189,20 @@ def test(request):
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message)
     return render(request,'HealthyLiving/test.html', context)
 
+#No longer needed
 def searchView1(request):
     return JsonResponse({
         'Items': list( Recipe.objects.values()),
     })
 
 class PostListView(ListView):
+    #Returns the list of recipes from the database
     model = Recipe
     template_name = 'HealthyLiving/recipes.html'
     queryset = Recipe.objects.all()
     context_object_name = 'Recipe'
     paginate_by = 9
-
+#Gets the query from the user and filters the database
     def get_queryset(self):
         title = self.request.GET.get('q')
         course = self.request.GET.get('filter')
@@ -204,7 +210,7 @@ class PostListView(ListView):
         print(course)
         if course == None:
             return Recipe.objects.all()
-
+#Checks to see if the query entered is empty
         if title != '':
             if (self.request.GET.get('filter') == 'All'):
                 return Recipe.objects.filter(Title__contains=self.request.GET.get('q'))
@@ -221,6 +227,7 @@ class PostDetailView(DetailView):
     model = Recipe
 
 def recentlyVisited(request , pk):
+    #Checks to see if user is logged into an account
     if not request.user.is_authenticated:
         return JsonResponse({
             'recieved' : 'nope'
@@ -246,6 +253,7 @@ def recentlyVisited(request , pk):
         })
 
 def favourites(request , pk):
+    #handles favouriting a recipe
     user = request.user
     recipe = Recipe.objects.get(pk = pk)
     recipeName = recipe.Title
@@ -270,7 +278,6 @@ def rating(request , pk):
     recipe = Recipe.objects.get(pk = request.POST['recipeID'])
     rating = request.POST['rating']
     recipeName = recipe.Title
-    #print(Rated.objects.all().order_by('-rating'))
 
     try:
         #Check to see if the record exists by date to prevent duplicates
@@ -334,7 +341,6 @@ def getRecipe(request, pk):
             print("Has not been rated")
             ratedRecipe = "None"
 
-        #print(recipe.ingredients.split(', '))
         return render(request,'HealthyLiving/recipe_detail.html',
         {
             'recipe': recipe,

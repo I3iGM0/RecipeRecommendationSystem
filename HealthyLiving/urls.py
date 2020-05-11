@@ -3,6 +3,7 @@ from django.conf.urls import url
 from .views import PostListView, PostDetailView
 from . import views
 
+# Links each URL to a view function
 urlpatterns = [
     path('', views.home, name='healthyliving-home'),
     url(r'^recipes/$', PostListView.as_view(), name='healthyliving-recipes'),

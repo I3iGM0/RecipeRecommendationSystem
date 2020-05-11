@@ -7,6 +7,7 @@ from .models import Profile
 CURRENT_YEAR = datetime.date.today().year
 YEARS = list(range(CURRENT_YEAR - 100, CURRENT_YEAR+1))
 
+# Design the forms 
 class DateInput(forms.DateInput):
     input_type = 'date'
 
