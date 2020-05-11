@@ -1,2 +1,2 @@
-# HealthyLivingApp
+# Recipe Recommendation System
  
