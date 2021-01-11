@@ -23,7 +23,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 # Create your views here.
-
+#
 #Opens and executes the dataset stored locally
 df = pd.read_csv(url,sep = ',')
 df.set_index('title', inplace = True)

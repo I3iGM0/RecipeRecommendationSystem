@@ -74,7 +74,7 @@
 
     <hr class="my-5">
     <div class="row">
-      <div class="col-xl-8">
+      <div class="col-xl-12">
           <div class="container">
             <h3>Rated Recipes</h3>
                 {% if Rated %}
@@ -115,24 +115,11 @@
               {% endfor %}
               </div>
             {% else %}
-            <p> Looks like you havent Favourited any recipes yet! Click 
+            <p> Looks like you havent Favourited any recipes yet! Click
               <a href="{% url 'healthyliving-recipes' %}" >Here</a>
               to begin browsing for recipes!</p>
             {% endif %}
           </div>
-      </div>
-      <div class="col-xl-4 col-md-auto">
-        <div class="ui card">
-          <a class="image" href="#">
-            <img src="{{ user.profile.image.url }}">
-          </a>
-          <div class="content">
-            <a class="header">{{ user.username }}</a>
-            <div class="meta">
-              <a>{{ user.email }}</a>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     <div class="row">
@@ -143,7 +130,7 @@
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
       <h1 class="display-4">Hi there!!</h1>
       <p class="lead">
-        Sign up to get access to features.
+        Register to recieve recommendations.
     </div>
   {% endif %}
 
